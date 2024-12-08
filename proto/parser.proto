@@ -1,0 +1,22 @@
+// > protoc --go_out . --go_opt paths=source_relative --go-grpc_out . --go-grpc_opt paths=source_relative proto/*.proto
+
+syntax = "proto3";
+
+option go_package = "proto/parser";
+
+service Parser {
+    rpc ParsePage (RawPageData) returns (ParsedPageResponse);
+}
+
+message RawPageData {
+    string html_content = 1;
+}
+
+message ParsedPageResponse {
+    string name = 1;
+    string availability = 2;
+    string upc = 3;
+    string price_excl_tax = 4;
+    string tax = 5;
+    string message = 6; // success/failure message
+}

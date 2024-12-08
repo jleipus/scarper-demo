@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parser-deployment
+  labels:
+    app: parser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parser
+  template:
+    metadata:
+      labels:
+        app: parser
+    spec:
+      containers:
+        - name: parser
+          image: parser-service:latest
+          args:
+            - "-ip"
+            - "0.0.0.0"
+            - "-port"
+            - "8080"
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
