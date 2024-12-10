@@ -1,21 +1,60 @@
-# Mac OS X files
-.DS_Store
-
-# Binaries for programs and plugins
+# Go build artifacts
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
-
-# Test binary, build with `go test -c`
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+*.a
+*.o
 
-# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
-.glide/
+# Go dependency directories
+vendor/
+bin/
+pkg/
+tmp/
+*.log
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
+# Virtual environment
+.env/
+.venv/
+env/
+venv/
+
+# Coverage and test results
+*.cover
+coverage.out
+*.lcov
+
+# Docker files
+*.dockerfile~
+docker-compose.override.yml
+docker-compose.override.yml~
+.dockerignore
+
+# Docker build cache
+**/build/
+**/cache/
+**/tmp/
+
+# Kubernetes configs
+*.yaml~
+*.yml~
+kustomization.yaml
+.manifest.yaml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Local build execution logs/tools

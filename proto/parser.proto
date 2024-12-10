@@ -18,5 +18,4 @@ message ParsedPageResponse {
     string upc = 3;
     string price_excl_tax = 4;
     string tax = 5;
-    string message = 6; // success/failure message
 }

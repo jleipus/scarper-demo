@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
-	"log"
-	"os"
+	"scaper-demo/internal/scraper"
 	"scaper-demo/internal/service"
 	pb "scaper-demo/proto"
+	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const baseURL = "http://books.toscrape.com/catalogue/page-%d.html"
@@ -21,36 +22,42 @@ func main() {
 
 func run(ctx context.Context) error {
 	parserAddress := flag.String("parser", "localhost:8080", "The parser service address")
-	startSite := flag.String("site", "https://books.toscrape.com/index.html", "The site to scrape")
+	pageLimit := flag.Int("limit", 0, "The page limit")
+	scrapingDelay := flag.Duration("delay", time.Second, "The delay between requests")
 	flag.Parse()
 
-	conn, err := grpc.NewClient(*parserAddress)
+	conn, err := grpc.NewClient(*parserAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return fmt.Errorf("failed to connect to server: %w", err)
 	}
 
 	parserClient := pb.NewParserClient(conn)
 
-	log.Printf("Scraping site %s", *startSite)
+	err = scraper.Run(ctx, func(urls []string) error {
+		for _, url := range urls {
+			html, err := scraper.FetchHTMLContent(url)
+			if err != nil {
+				return fmt.Errorf("failed to fetch page: %w", err)
+			}
 
-	file, err := os.Open(`.\cmd\scraper\example_page.html`)
+			response, err := parserClient.ParsePage(ctx, &pb.RawPageData{HtmlContent: html})
+			if err != nil {
+				return fmt.Errorf("failed to parse page: %w", err)
+			}
+
+			bytes, err := json.MarshalIndent(response, "", "  ")
+			if err != nil {
+				return fmt.Errorf("failed to marshal response: %w", err)
+			}
+
+			fmt.Println(string(bytes))
+		}
+
+		return nil
+	}, *pageLimit, *scrapingDelay)
 	if err != nil {
-		return fmt.Errorf("failed to open file: %w", err)
-	}
-	defer file.Close()
-
-	data, err := io.ReadAll(file)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
+		return fmt.Errorf("failed to run scraper: %w", err)
 	}
 
-	response, err := parserClient.ParsePage(ctx, &pb.RawPageData{HtmlContent: string(data)})
-	if err != nil {
-		return fmt.Errorf("failed to parse page: %w", err)
-	}
-
-	log.Printf("Parsed page: %v", response)
-
-	<-ctx.Done()
 	return nil
 }

@@ -9,8 +9,8 @@ import (
 
 	pb "scaper-demo/proto"
 
+	"scaper-demo/internal/parser"
 	"scaper-demo/internal/service"
-	parser "scaper-demo/pkg/grpc"
 
 	"google.golang.org/grpc"
 )
