@@ -37,7 +37,7 @@ func run(ctx context.Context) error {
 		grpcServer.GracefulStop()
 	}()
 
-	pb.RegisterParserServer(grpcServer, parser.NewParserServer())
+	pb.RegisterParserServer(grpcServer, parser.NewParserServer(parser.ParseHTMLContent))
 
 	log.Printf("Parser service running on %s", serverAddress)
 	if err := grpcServer.Serve(listener); err != nil {
